@@ -1,9 +1,7 @@
 // server.js
-import dotenv from 'dotenv';
 import express from 'express';
 import router from './routes/index';
 
-dotenv.config()
 
 const port = process.env.PORT || 5000;
 
