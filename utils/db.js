@@ -1,7 +1,4 @@
 const { MongoClient } = require('mongodb');
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const host = process.env.DB_HOST || 'localhost';
 const port = process.env.DB_PORT || 27017;
