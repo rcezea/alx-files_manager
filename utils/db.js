@@ -1,47 +1,39 @@
-const { MongoClient } = require('mongodb');
-import dotenv from 'dotenv';
+import { MongoClient, ObjectId } from 'mongodb';
 
-dotenv.config();
+const host = process.env.DB_HOST || 'localhost';
+const port = process.env.DB_PORT || 27017;
+const dbName = process.env.DB_DATABASE || 'files_manager';
+const url = `mongodb://${host}:${port}`;
 
-/**
- * Represents a MongoDB client.
- */
 class DBClient {
   constructor() {
-    const host = process.env.DB_HOST || 'localhost';
-    const port = process.env.DB_PORT || 27017;
-    const database = process.env.DB_DATABASE || 'files_manager';
-    const url = `mongodb://${host}:${port}`;
+    this.client = MongoClient(url, { useUnifiedTopology: true });
+    this.connect();
+    this.connected = false;
+  }
 
-    this.client = new MongoClient(url, { useUnifiedTopology: true });
-    this.client.connect()
-      .then((client) => {
-        this.db = client.db(database);
-        this.userCollection = this.db.collection('users');
-        this.fileCollection = this.db.collection('files');
-      })
-      .catch((err) => {
-        console.error(err);
-        return err;
-      });
+  async connect() {
+    await this.client.connect();
+    this.connected = true;
+    this.db = this.client.db(dbName);
+    this.fileCollection = this.db.collection('files');
+    this.userCollection = this.db.collection('users');
   }
 
   isAlive() {
-    return !!this.db;
+    return this.connected;
   }
 
   async nbUsers() {
-    if (!this.isAlive()) {
-      return 0;
-    }
-    return await this.userCollection.countDocuments({});
+    const usersCollection = this.db.collection('users');
+    const noOfCollections = await usersCollection.countDocuments({});
+    return noOfCollections;
   }
 
   async nbFiles() {
-    if (!this.isAlive()) {
-      return 0;
-    }
-    return await this.fileCollection.countDocuments({});
+    const filesCollection = this.db.collection('files');
+    const noOfFiles = await filesCollection.countDocuments({});
+    return noOfFiles;
   }
 }
 
