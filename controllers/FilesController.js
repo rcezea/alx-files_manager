@@ -102,12 +102,14 @@ export const postUpload = async (req, res) => {
 export const getShow = async (req, res) => {
   // const fileId = new ObjectId(req.params.id);
   // console.log(fileId);
-
+  // retrieve user based on the token
   const userId = await redisClient.get(`auth_${req.headers['x-token']}`);
   if (!userId) return res.status(401).json({"error": "Unauthorized"});
   // const id = new ObjectId(userId);
   const user = await dbClient.userCollection.findOne({"_id": new ObjectId(userId)});
   if (!user) return res.status(401).json({"error": "Unauthorized"});
+
+  // retrieve file from user id and file id
   const file = await dbClient.fileCollection.findOne({userId, "_id": new ObjectId(req.params.id)});
   if(!file) return res.status(404).json({"error": "Not found"});
   return res.status(200).json({
@@ -154,6 +156,65 @@ export const getIndex = async (req, res) => {
   return res.status(200).send(files);
 };
 
+export const putPublish = async (req, res) => {
+  // retrieve user based on the token
+  const userId = await redisClient.get(`auth_${req.headers['x-token']}`);
+  if (!userId) return res.status(401).json({"error": "Unauthorized"});
+  const user = await dbClient.userCollection.findOne({"_id": new ObjectId(userId)});
+  if (!user) return res.status(401).json({"error": "Unauthorized"});
+
+  // retrieve file from user id and file id
+  const param = {userId, "_id": new ObjectId(req.params.id)};
+  const updateDoc = {
+    $set: {
+      isPublic: true
+    },
+  };
+  // const file = await dbClient.fileCollection.findOne(param);
+  // if(!file) return res.status(404).json({"error": "Not found"});
+
+  const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
+  if(!updatedFile) return res.status(404).json({"error": "Not found"});
+  const file = await dbClient.fileCollection.findOne(param);
+
+  return res.status(200).json({
+    id: file._id,
+    userId,
+    name: file.name,
+    type: file.type,
+    isPublic: file.isPublic,
+    parentId: file.parentId,
+  })
+
+};
+export const putUnpublish = async (req, res) => {
+  // retrieve user based on the token
+  const userId = await redisClient.get(`auth_${req.headers['x-token']}`);
+  if (!userId) return res.status(401).json({"error": "Unauthorized"});
+  const user = await dbClient.userCollection.findOne({"_id": new ObjectId(userId)});
+  if (!user) return res.status(401).json({"error": "Unauthorized"});
+
+  // retrieve file from user id and file id
+  const param = {userId, "_id": new ObjectId(req.params.id)};
+  const updateDoc = {
+    $set: {
+      isPublic: false
+    },
+  };
+
+  const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
+  if(!updatedFile) return res.status(404).json({"error": "Not found"});
+  const file = await dbClient.fileCollection.findOne(param);
+  return res.status(200).json({
+    id: file._id,
+    userId,
+    name: file.name,
+    type: file.type,
+    isPublic: file.isPublic,
+    parentId: file.parentId,
+  })
+};
+
 // curl -XPOST 0.0.0.0:3000/files -H "X-Token: b182d152-4148-4cec-8352-c9c34d7fd493" -H "Content-Type: application/json" -d '{ "name": "myText.txt", "type": "file", "data": "SGVsbG8gV2Vic3RhY2shCg==" }' ; echo ""
 // curl 0.0.0.0:3000/connect -H "Authorization: Basic Ym9iQGR5bGFuLmNvbTp0b3RvMTIzNCE=" ; echo ""
 // {"token":"b182d152-4148-4cec-8352-c9c34d7fd493"}
@@ -167,3 +228,6 @@ export const getIndex = async (req, res) => {
 // echo 'db.files.find()' | mongosh files_manager
 
 // curl -XGET 0.0.0.0:3000/files -H "X-Token: b182d152-4148-4cec-8352-c9c34d7fd493" ; echo ""
+
+
+// curl -XPUT 0.0.0.0:3000/files/668034e6fd5ac301bd955f9e/publish -H "X-Token: b182d152-4148-4cec-8352-c9c34d7fd493" ; echo ""
