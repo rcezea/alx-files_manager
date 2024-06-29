@@ -11,15 +11,16 @@ class DBClient {
     const url = `mongodb://${host}:${port}`;
 
     this.client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
-    this.client.connect((err) => {
-      if (err) {
-        this.db = null;
-      } else {
-        this.db = this.client.db(database);
+    this.client.connect()
+      .then((client) => {
+        this.db = client.db(database);
         this.userCollection = this.db.collection('users');
         this.fileCollection = this.db.collection('files');
-      }
-    });
+      })
+      .catch((err) => {
+        console.error(err);
+        return err;
+      });
   }
 
   isAlive() {
