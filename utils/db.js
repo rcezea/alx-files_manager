@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+/**
+ * Represents a MongoDB client.
+ */
 class DBClient {
   constructor() {
     const host = process.env.DB_HOST || 'localhost';
@@ -10,7 +13,7 @@ class DBClient {
     const database = process.env.DB_DATABASE || 'files_manager';
     const url = `mongodb://${host}:${port}`;
 
-    this.client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.client.connect()
       .then((client) => {
         this.db = client.db(database);
