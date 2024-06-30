@@ -3,7 +3,7 @@ import redisClient from '../utils/redis';
 import sha1 from 'sha1';
 import { v4 as uuidv4 } from 'uuid';
 
-export default class AuthController {
+class AuthController {
   static getConnect = async (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
@@ -30,3 +30,4 @@ export default class AuthController {
     return res.status(204).end();
   };
 }
+module.exports = AuthController;
