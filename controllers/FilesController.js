@@ -2,11 +2,12 @@
 
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'node:fs';
 import authenticateUser from '../utils/authUtils';
 import { getUserById, insertDocument } from '../utils/dbUtils';
 import handleUnauthorized from '../utils/errorUtils';
 import dbClient from '../utils/db';
+
+const fs = require('fs');
 
 class FilesController {
   static async postUpload(req, res) {
