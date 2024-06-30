@@ -28,14 +28,14 @@ class DBClient {
     if (!this.isAlive()) {
       return 0;
     }
-    return this.userCollection.countDocuments();
+    return await this.userCollection.countDocuments({});
   }
 
   async nbFiles() {
     if (!this.isAlive()) {
       return 0;
     }
-    return this.fileCollection.countDocuments();
+    return await this.fileCollection.countDocuments({});
   }
 }
 
