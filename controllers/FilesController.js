@@ -20,7 +20,7 @@ class FilesController {
       type: req.body.type || null,
       parentId: req.body.parentId || 0,
       isPublic: req.body.isPublic || false,
-      data: req.body.data || null,
+      data: req.body.data || null
     };
 
     if (!file.name) return res.status(400).json({ error: 'Missing name' });
@@ -42,7 +42,7 @@ class FilesController {
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId,
+        parentId: file.parentId
       });
     }
 
@@ -68,7 +68,7 @@ class FilesController {
               name: file.name,
               type: file.type,
               isPublic: file.isPublic,
-              parentId: file.parentId,
+              parentId: file.parentId
             });
           }
         });
@@ -96,7 +96,7 @@ class FilesController {
       name: file.name,
       type: file.type,
       isPublic: file.isPublic,
-      parentId: file.parentId,
+      parentId: file.parentId
     });
   };
 
@@ -126,9 +126,9 @@ class FilesController {
           name: 1,
           type: 1,
           isPublic: 1,
-          parentId: 1,
-        },
-      },
+          parentId: 1
+        }
+      }
     ]).toArray();
 
     return res.status(200).send(files);
@@ -146,8 +146,8 @@ class FilesController {
     const param = { userId, _id: new ObjectId(req.params.id) };
     const updateDoc = {
       $set: {
-        isPublic: true,
-      },
+        isPublic: true
+      }
     };
 
     const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
@@ -161,7 +161,7 @@ class FilesController {
       name: file.name,
       type: file.type,
       isPublic: file.isPublic,
-      parentId: file.parentId,
+      parentId: file.parentId
     });
   };
 
@@ -177,8 +177,8 @@ class FilesController {
     const param = { userId, _id: new ObjectId(req.params.id) };
     const updateDoc = {
       $set: {
-        isPublic: false,
-      },
+        isPublic: false
+      }
     };
 
     const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
@@ -191,7 +191,7 @@ class FilesController {
       name: file.name,
       type: file.type,
       isPublic: file.isPublic,
-      parentId: file.parentId,
+      parentId: file.parentId
     });
   };
 }

@@ -10,12 +10,12 @@ class UsersController {
 
     if (!email) {
       return res.status(400).json({
-        error: 'Missing email',
+        error: 'Missing email'
       });
     }
     if (!password) {
       return res.status(400).json({
-        error: 'Missing password',
+        error: 'Missing password'
       });
     }
 
@@ -29,7 +29,7 @@ class UsersController {
 
     return res.status(201).json({
       id: userId,
-      email,
+      email
     });
   };
 
@@ -42,7 +42,7 @@ class UsersController {
 
     return res.status(200).json({
       id: userId,
-      email: user.email,
+      email: user.email
     });
   };
 }
