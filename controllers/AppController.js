@@ -7,12 +7,12 @@ class AppController {
    * by using the 2 utils created previously:
    * { "redis": true, "db": true } with a status code 200
    */
-  static getStatus(request, response) {
+  static getStatus(req, res) {
     const status = {
       redis: redisClient.isAlive(),
       db: dbClient.isAlive(),
     };
-    response.status(200).send(status);
+    res.status(200).send(status);
   }
 
   /**
@@ -20,13 +20,13 @@ class AppController {
    * { "users": 12, "files": 1231 }
    *  with a status code 200
    */
-  static async getStats(request, response) {
+  static async getStats(req, res) {
     const stats = {
       users: await dbClient.nbUsers(),
       files: await dbClient.nbFiles(),
     };
-    response.status(200).send(stats);
+    res.status(200).send(stats);
   }
 }
 
-export default AppController;
+module.exports = AppController;

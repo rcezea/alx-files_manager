@@ -4,48 +4,27 @@ import UsersController from '../controllers/UsersController';
 import AuthController from '../controllers/AuthController';
 import FilesController from '../controllers/FilesController';
 
-const router = express.Router();
+function controllerRouting(app) {
+  const router = express.Router();
+  app.use('/', router);
 
-// App Controller
+  // App Controller
+  router.get('/status', AppController.getStatus);
+  router.get('/stats', AppController.getStats);
 
-// should return if Redis is alive and if the DB is alive
-router.get('/status', AppController.getStatus);
+  // User Controller
+  router.post('/users', UsersController.postNew);
+  router.get('/users/me', UsersController.getMe);
 
-// should return the number of users and files in DB
-router.get('/stats', AppController.getStats);
+  // Auth Controller
+  router.get('/connect', AuthController.getConnect);
+  router.get('/disconnect', AuthController.getDisconnect);
 
-// User Controller
-
-// should create a new user in DB
-router.post('/users', UsersController.postNew);
-
-// should retrieve the user base on the token used
-router.get('/users/me', UsersController.getMe);
-
-// Auth Controller
-
-// should sign in the user by generating a new authentication token
-router.get('/connect', AuthController.getConnect);
-
-// should sign out the user based on the token
-router.get('/disconnect', AuthController.getDisconnect);
-
-// Files Controller
-
-// should create a new file in DB and in disk
-router.post('/files', FilesController.postUpload);
-
-// should retrieve the file document based on the ID
-router.get('/files/:id', FilesController.getShow);
-
-// should retrieve all users file documents for a
-// specific parentId and with pagination
-router.get('/files', FilesController.getIndex);
-
-// should set isPublic to true on the file document based on the ID
-router.put('/files/:id/publish', FilesController.putPublish);
-
-// should set isPublic to false on the file document based on the ID
-router.put('/files/:id/unpublish', FilesController.putUnpublish);
-
-module.exports = router;
+  // Files Controller
+  router.post('/files', FilesController.postUpload);
+  router.get('/files/:id', FilesController.getShow);
+  router.get('/files', FilesController.getIndex);
+  router.put('/files/:id/publish', FilesController.putPublish);
+  router.put('/files/:id/unpublish', FilesController.putUnpublish);
+}
+export default controllerRouting;
