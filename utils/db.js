@@ -14,6 +14,7 @@ class DBClient {
         this.fileCollection = this.db.collection('files');
       })
       .catch((err) => {
+        console.error(err);
         return err;
       });
   }
