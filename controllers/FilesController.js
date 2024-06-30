@@ -25,11 +25,16 @@ class FilesController {
       data: req.body.data || null,
     };
 
-    if (!file.name || !file.type || (!file.data && file.type !== 'folder')) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    if (!file.name) return res.status(400).json({ error: 'Missing name' });
+    if (!file.type) return res.status(400).json({ error: 'Missing type' });
+    if (!file.data && file.type !== 'folder') return res.status(400).json({ error: 'Missing data' });
 
-    // Additional validations can be added here...
+    if (file.parentId !== 0) {
+      const parentId = new ObjectId(file.parentId);
+      const storedFile = await dbClient.fileCollection.findOne({ _id: parentId });
+      if (!storedFile) return res.status(400).json({ error: 'Parent not found' });
+      if (storedFile.type !== 'folder') return res.status(400).json({ error: 'Parent is not a folder' });
+    }
 
     if (file.type === 'folder') {
       const newFile = await insertDocument('fileCollection', file);
