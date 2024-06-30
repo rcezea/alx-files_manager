@@ -48,4 +48,4 @@ router.put('/files/:id/publish', FilesController.putPublish);
 // should set isPublic to false on the file document based on the ID
 router.put('/files/:id/unpublish', FilesController.putUnpublish);
 
-export default router;
+module.exports = router;
