@@ -15,7 +15,6 @@ class DBClient {
       })
       .catch((err) => {
         console.error(err);
-        return err;
       });
   }
 
