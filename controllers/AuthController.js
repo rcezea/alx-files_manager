@@ -1,10 +1,10 @@
-import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
 import sha1 from 'sha1';
 import { v4 as uuidv4 } from 'uuid';
+import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 class AuthController {
-  static getConnect = async (req, res) => {
+  static async getConnect(req, res) {
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -23,11 +23,11 @@ class AuthController {
 
     await redisClient.set(key, user._id.toString(), 86400);
     return res.status(200).json({ token });
-  };
+  }
 
-  static getDisconnect = async (req, res) => {
+  static async getDisconnect(req, res) {
     await redisClient.del(`auth_${req.headers['x-token']}`);
     return res.status(204).end();
-  };
+  }
 }
 module.exports = AuthController;
