@@ -1,7 +1,5 @@
-// index.js
 const express = require('express');
-import AppController from '../controllers/AppController';
-// const { getStatus, getStats } = require('../controllers/AppController');
+const { getStatus, getStats } = require('../controllers/AppController');
 const { postNew, getMe } = require('../controllers/UsersController');
 const { getConnect, getDisconnect } = require('../controllers/AuthController');
 const { postUpload, getShow, getIndex, putPublish, putUnpublish } = require('../controllers/FilesController');
@@ -9,8 +7,8 @@ const { postUpload, getShow, getIndex, putPublish, putUnpublish } = require('../
 const router = express.Router();
 
 
-router.get('/status', AppController.getStatus);
-router.get('/stats', AppController.getStats);
+router.get('/status', getStatus);
+router.get('/stats', getStats);
 router.post('/users', postNew);
 router.get('/connect', getConnect);
 router.get('/disconnect', getDisconnect);
