@@ -22,12 +22,12 @@ class FilesController {
       type: req.body.type || null,
       parentId: req.body.parentId || 0,
       isPublic: req.body.isPublic || false,
-      data: req.body.data || null,
     };
+    let data = req.body.data || null;
 
     if (!file.name) return res.status(400).json({ error: 'Missing name' });
     if (!file.type) return res.status(400).json({ error: 'Missing type' });
-    if (!file.data && file.type !== 'folder') return res.status(400).json({ error: 'Missing data' });
+    if (!data && file.type !== 'folder') return res.status(400).json({ error: 'Missing data' });
 
     if (file.parentId !== 0) {
       const parentId = new ObjectId(file.parentId);
@@ -54,7 +54,7 @@ class FilesController {
     try {
       await fs.promises.opendir(path);
       const filename = uuidv4();
-      const data = Buffer.from(file.data, 'base64');
+      data = Buffer.from(data, 'base64');
       const filePath = `${path}/${filename}`;
 
       await fs.promises.writeFile(filePath, data);
