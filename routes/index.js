@@ -1,8 +1,8 @@
-const express = require('express');
-const { getStatus, getStats } = require('../controllers/AppController');
-const { postNew, getMe } = require('../controllers/UsersController');
-const { getConnect, getDisconnect } = require('../controllers/AuthController');
-const { postUpload, getShow, getIndex, putPublish, putUnpublish } = require('../controllers/FilesController');
+import express from 'express';
+import {getStatus, getStats} from '../controllers/AppController';
+import {postNew, getMe} from '../controllers/UsersController';
+import {getConnect, getDisconnect} from '../controllers/AuthController';
+import {postUpload, getShow, getIndex, putPublish, putUnpublish} from '../controllers/FilesController';
 
 const router = express.Router();
 
