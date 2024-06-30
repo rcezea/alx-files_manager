@@ -1,6 +1,6 @@
 const express = require('express');
-const router = require('./routes/index');
 require('dotenv').config();
+import router from "./routes";
 
 const port = process.env.PORT || 5000;
 
