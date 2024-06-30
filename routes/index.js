@@ -19,4 +19,4 @@ router.get('/files', getIndex);
 router.put('/files/:id/publish', putPublish);
 router.put('/files/:id/unpublish', putUnpublish)
 
-export default router;
+module.exports = router;
