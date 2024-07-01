@@ -100,7 +100,7 @@ class FilesController {
   }
 
   static async getIndex(req, res) {
-    const parentId = req.query.parentId || 0;
+    let parentId = req.query.parentId || 0;
     const userId = await authenticateUser(req);
     if (!userId) return handleUnauthorized(res);
 
@@ -111,26 +111,28 @@ class FilesController {
     const pageSize = 20;
     const skip = page * pageSize;
 
-    if (!ObjectId.isValid(req.query.parentId)) return res.status(404).json({ error: 'Not found' });
-    const files = await dbClient.fileCollection
-      .aggregate([
-        { $match: { userId, parentId } },
-        { $skip: skip },
-        { $limit: pageSize },
-        {
-          $project: {
-            _id: 1,
-            userId: 1,
-            name: 1,
-            type: 1,
-            isPublic: 1,
-            parentId: 1,
-          },
-        },
-      ])
-      .toArray();
-    if (!files) return res.status(404).json({ error: 'Not found' });
-    return res.status(200).send(files);
+    if (parentId) {
+      try {
+        parentId = ObjectId(parentId);
+      } catch (err) {
+        if (err) parentId = Number(req.query.parentId) || 0;
+      }
+    }
+
+    const cursor = dbClient.fileCollection.aggregate([
+      { $match: { userId: ObjectId(user._id), parentId } },
+      { $skip: page },
+      { $limit: skip },
+    ]);
+    const files = await cursor.toArray();
+    for (let i = 0; i < files.length; i += 1) {
+      const doc = files[i];
+      doc.id = doc._id;
+      delete (doc._id);
+      delete (doc.localPath);
+    }
+    cursor.close();
+    return res.send(files);
   }
 
   static async putPublish(req, res) {
