@@ -82,6 +82,7 @@ class FilesController {
     const user = await getUserById(userId);
     if (!user) return handleUnauthorized(res);
 
+    if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ error: 'Not found' });
     const file = await dbClient.fileCollection.findOne({
       userId,
       _id: new ObjectId(req.params.id),
@@ -128,10 +129,10 @@ class FilesController {
           },
         ])
         .toArray();
-
+      if (!files) return res.status(404).json({ error: 'Not found' });
       return res.status(200).send(files);
     }
-
+    if (!ObjectId.isValid(req.query.parentId)) return res.status(404).json({ error: 'Not found' });
     const files = await dbClient.fileCollection
       .aggregate([
         { $match: { parentId } },
@@ -149,7 +150,7 @@ class FilesController {
         },
       ])
       .toArray();
-
+    if (!files) return res.status(404).json({ error: 'Not found' });
     return res.status(200).send(files);
   }
 
