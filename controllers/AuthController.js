@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import handleUnauthorized from '../utils/errorUtils';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
+import authenticateUser from '../utils/authUtils';
+import { getUserById } from '../utils/dbUtils';
 
 class AuthController {
   static async getConnect(req, res) {
@@ -26,6 +28,12 @@ class AuthController {
   }
 
   static async getDisconnect(req, res) {
+    const userId = await authenticateUser(req);
+    if (!userId) return handleUnauthorized(res);
+
+    const user = await getUserById(userId);
+    if (!user) return handleUnauthorized(res);
+
     await redisClient.del(`auth_${req.headers['x-token']}`);
     return res.status(204).end();
   }
