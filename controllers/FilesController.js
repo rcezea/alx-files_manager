@@ -111,21 +111,48 @@ class FilesController {
     const pageSize = 20;
     const skip = (page - 1) * pageSize;
 
+    if (parentId === 0) {
+      const files = await dbClient.fileCollection
+        .aggregate([
+          { $match: { userId } },
+          { $sort: { parentId: 1 } },
+          { $skip: skip },
+          { $limit: pageSize },
+          {
+            $project: {
+              _id: 1,
+              userId: 1,
+              name: 1,
+              type: 1,
+              isPublic: 1,
+              parentId: {
+                $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+              },
+            },
+          },
+        ])
+        .toArray();
+      if (!files) return res.status(404).json({ error: 'Not found' });
+      return res.status(200).send(files);
+    }
+
     if (!ObjectId.isValid(req.query.parentId)) return res.status(404).json({ error: 'Not found' });
     const files = await dbClient.fileCollection
       .aggregate([
         { $match: { parentId } },
+        { $sort: { parentId: 1 } },
         { $skip: skip },
         { $limit: pageSize },
         {
           $project: {
-            _id: 0,
-            id: '$_id',
+            _id: 1,
             userId: 1,
             name: 1,
             type: 1,
             isPublic: 1,
-            parentId: 1,
+            parentId: {
+              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+            },
           },
         },
       ])
