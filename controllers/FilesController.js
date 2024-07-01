@@ -120,7 +120,7 @@ class FilesController {
     }
 
     const cursor = dbClient.fileCollection.aggregate([
-      { $match: { userId: ObjectId(user._id), parentId } },
+      { $match: { parentId } },
       { $skip: page },
       { $limit: skip },
     ]);
