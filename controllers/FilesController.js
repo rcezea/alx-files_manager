@@ -84,8 +84,8 @@ class FilesController {
 
     if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ error: 'Not found' });
     const file = await dbClient.fileCollection.findOne({
-      userId,
       _id: new ObjectId(req.params.id),
+      userId,
     });
     if (!file) return res.status(404).json({ error: 'Not found' });
 
@@ -99,7 +99,7 @@ class FilesController {
     });
   }
 
-  static async getIndex(req, res) {
+  /* static async getIndex(req, res) {
     const parentId = req.query.parentId || 0;
     const userId = await authenticateUser(req);
     if (!userId) return handleUnauthorized(res);
@@ -209,6 +209,7 @@ class FilesController {
       parentId: file.parentId,
     });
   }
+} */
 }
 
 export default FilesController;
