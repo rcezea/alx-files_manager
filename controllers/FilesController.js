@@ -107,9 +107,9 @@ class FilesController {
     const user = await getUserById(userId);
     if (!user) return handleUnauthorized(res);
 
-    const page = parseInt(req.query.page, 10) || 1;
+    const page = parseInt(req.query.page, 10) || 0;
     const pageSize = 20;
-    const skip = (page - 1) * pageSize;
+    const skip = page * pageSize;
 
     if (parentId === 0) {
       const files = await dbClient.fileCollection
