@@ -99,7 +99,7 @@ class FilesController {
     });
   }
 
-  /* static async getIndex(req, res) {
+  static async getIndex(req, res) {
     const parentId = req.query.parentId || 0;
     const userId = await authenticateUser(req);
     if (!userId) return handleUnauthorized(res);
@@ -107,31 +107,10 @@ class FilesController {
     const user = await getUserById(userId);
     if (!user) return handleUnauthorized(res);
 
-    const page = parseInt(req.query.page, 10) || 1;
+    const page = parseInt(req.query.page, 10) || 0;
     const pageSize = 20;
-    const skip = (page - 1) * pageSize;
+    const skip = page * pageSize;
 
-    if (parentId === 0) {
-      const files = await dbClient.fileCollection
-        .aggregate([
-          { $match: { userId } },
-          { $skip: skip },
-          { $limit: pageSize },
-          {
-            $project: {
-              _id: 1,
-              userId: 1,
-              name: 1,
-              type: 1,
-              isPublic: 1,
-              parentId: 1,
-            },
-          },
-        ])
-        .toArray();
-      if (!files) return res.status(404).json({ error: 'Not found' });
-      return res.status(200).send(files);
-    }
     if (!ObjectId.isValid(req.query.parentId)) return res.status(404).json({ error: 'Not found' });
     const files = await dbClient.fileCollection
       .aggregate([
@@ -154,62 +133,61 @@ class FilesController {
     return res.status(200).send(files);
   }
 
-  static async putPublish(req, res) {
-    const userId = await authenticateUser(req);
-    if (!userId) return handleUnauthorized(res);
-
-    const user = await getUserById(userId);
-    if (!user) return handleUnauthorized(res);
-
-    const param = { userId, _id: new ObjectId(req.params.id) };
-    const updateDoc = {
-      $set: {
-        isPublic: true,
-      },
-    };
-
-    const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
-    if (!updatedFile) return res.status(404).json({ error: 'Not found' });
-
-    const file = await dbClient.fileCollection.findOne(param);
-    return res.status(200).json({
-      id: file._id,
-      userId,
-      name: file.name,
-      type: file.type,
-      isPublic: file.isPublic,
-      parentId: file.parentId,
-    });
-  }
-
-  static async putUnpublish(req, res) {
-    const userId = await authenticateUser(req);
-    if (!userId) return handleUnauthorized(res);
-
-    const user = await getUserById(userId);
-    if (!user) return handleUnauthorized(res);
-
-    const param = { userId, _id: new ObjectId(req.params.id) };
-    const updateDoc = {
-      $set: {
-        isPublic: false,
-      },
-    };
-
-    const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
-    if (!updatedFile) return res.status(404).json({ error: 'Not found' });
-
-    const file = await dbClient.fileCollection.findOne(param);
-    return res.status(200).json({
-      id: file._id,
-      userId,
-      name: file.name,
-      type: file.type,
-      isPublic: file.isPublic,
-      parentId: file.parentId,
-    });
-  }
-} */
+  // static async putPublish(req, res) {
+  //   const userId = await authenticateUser(req);
+  //   if (!userId) return handleUnauthorized(res);
+  //
+  //   const user = await getUserById(userId);
+  //   if (!user) return handleUnauthorized(res);
+  //
+  //   const param = { userId, _id: new ObjectId(req.params.id) };
+  //   const updateDoc = {
+  //     $set: {
+  //       isPublic: true,
+  //     },
+  //   };
+  //
+  //   const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
+  //   if (!updatedFile) return res.status(404).json({ error: 'Not found' });
+  //
+  //   const file = await dbClient.fileCollection.findOne(param);
+  //   return res.status(200).json({
+  //     id: file._id,
+  //     userId,
+  //     name: file.name,
+  //     type: file.type,
+  //     isPublic: file.isPublic,
+  //     parentId: file.parentId,
+  //   });
+  // }
+  //
+  // static async putUnpublish(req, res) {
+  //   const userId = await authenticateUser(req);
+  //   if (!userId) return handleUnauthorized(res);
+  //
+  //   const user = await getUserById(userId);
+  //   if (!user) return handleUnauthorized(res);
+  //
+  //   const param = { userId, _id: new ObjectId(req.params.id) };
+  //   const updateDoc = {
+  //     $set: {
+  //       isPublic: false,
+  //     },
+  //   };
+  //
+  //   const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
+  //   if (!updatedFile) return res.status(404).json({ error: 'Not found' });
+  //
+  //   const file = await dbClient.fileCollection.findOne(param);
+  //   return res.status(200).json({
+  //     id: file._id,
+  //     userId,
+  //     name: file.name,
+  //     type: file.type,
+  //     isPublic: file.isPublic,
+  //     parentId: file.parentId,
+  //   });
+  // }
 }
 
 export default FilesController;
