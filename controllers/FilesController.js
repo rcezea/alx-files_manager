@@ -114,8 +114,7 @@ class FilesController {
     if (!ObjectId.isValid(req.query.parentId)) return res.status(404).json({ error: 'Not found' });
     const files = await dbClient.fileCollection
       .aggregate([
-        { $match: { parentId } },
-        { $sort: { parentId: 1 } },
+        { $match: { userId, parentId } },
         { $skip: skip },
         { $limit: pageSize },
         {
@@ -125,9 +124,7 @@ class FilesController {
             name: 1,
             type: 1,
             isPublic: 1,
-            parentId: {
-              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
-            },
+            parentId: 1,
           },
         },
       ])
