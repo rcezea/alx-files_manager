@@ -11,8 +11,8 @@ class AppController {
   }
 
   static async getStats(req, res) {
-    const numberOfUsers = await dbClient.nbUsers();
-    const numberOfFiles = await dbClient.nbFiles();
+    const numberOfUsers = await dbClient.userCollection.countDocuments();
+    const numberOfFiles = await dbClient.fileCollection.countDocuments();
     return res.send({ users: numberOfUsers, files: numberOfFiles });
   }
 }
