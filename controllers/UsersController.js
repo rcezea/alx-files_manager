@@ -30,7 +30,7 @@ class UsersController {
 
   static async getMe(req, res) {
     const userId = await authenticateUser(req);
-    if (!userId) return handleUnauthorized(res);
+    // if (!userId) return handleUnauthorized(res);
 
     const user = await getUserById(userId);
     if (!user) return handleUnauthorized(res);
