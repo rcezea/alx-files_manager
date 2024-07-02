@@ -118,11 +118,17 @@ class FilesController {
         if (err) parentId = Number(req.query.parentId) || 0;
       }
     }
-
+    const filesFilter = {
+      userId: user._id,
+      // eslint-disable-next-line no-nested-ternary
+      parentId: parentId === 0
+        ? parentId
+        : ObjectId.isValid(parentId) ? parentId : 0,
+    };
     const cursor = dbClient.fileCollection.aggregate([
-      { $match: { parentId } },
-      { $skip: page },
-      { $limit: skip },
+      { $match: { filesFilter } },
+      { $skip: skip },
+      { $limit: pageSize },
     ]);
     const files = await cursor.toArray();
     for (let i = 0; i < files.length; i += 1) {
