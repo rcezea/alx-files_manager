@@ -118,7 +118,7 @@ class FilesController {
     console.log(parentId);
     const cursor = dbClient.fileCollection.aggregate([
       { $match: query },
-      { $sort: { id: -1 } },
+      { $sort: { _id: -1 } },
       { $skip: skip },
       { $limit: pageSize },
       {
