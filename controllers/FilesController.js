@@ -6,6 +6,7 @@ import authenticateUser from '../utils/authUtils';
 import { getUserById, insertDocument } from '../utils/dbUtils';
 import handleUnauthorized from '../utils/errorUtils';
 import dbClient from '../utils/db';
+import redisClient from '../utils/redis';
 
 const fs = require('fs');
 
@@ -100,57 +101,60 @@ class FilesController {
   }
 
   static async getIndex(req, res) {
-    const parentId = req.query.parentId || 0;
-    const userId = await authenticateUser(req);
-    if (!userId) return handleUnauthorized(res);
+    if (redisClient.isAlive() && dbClient.isAlive()) {
+      const parentId = req.query.parentId || 0;
+      const userId = await authenticateUser(req);
+      if (!userId) return handleUnauthorized(res);
 
-    const user = await getUserById(userId);
-    if (!user) return handleUnauthorized(res);
+      const user = await getUserById(userId);
+      if (!user) return handleUnauthorized(res);
 
-    const page = parseInt(req.query.page, 10) || 0;
-    const pageSize = 20;
-    const skip = page * pageSize;
+      const page = parseInt(req.query.page, 10) || 0;
+      const pageSize = 20;
+      const skip = page * pageSize;
 
-    let cursor;
-    if (parentId === 0) {
-      cursor = dbClient.fileCollection.aggregate([
-        { $match: { userId } },
-        { $sort: { id: -1 } },
-        { $skip: skip },
-        { $limit: pageSize },
-        {
-          $project: {
-            _id: 0,
-            id: '$_id',
-            userId: '$userId',
-            name: '$name',
-            type: '$type',
-            isPublic: '$isPublic',
-            parentId: '$parentId',
+      let cursor;
+      if (parentId === 0) {
+        cursor = dbClient.fileCollection.aggregate([
+          { $match: { userId } },
+          { $sort: { id: -1 } },
+          { $skip: skip },
+          { $limit: pageSize },
+          {
+            $project: {
+              _id: 0,
+              id: '$_id',
+              userId: '$userId',
+              name: '$name',
+              type: '$type',
+              isPublic: '$isPublic',
+              parentId: '$parentId',
+            },
           },
-        },
-      ]);
-    } else {
-      cursor = dbClient.fileCollection.aggregate([
-        { $match: { parentId } },
-        { $sort: { id: -1 } },
-        { $skip: skip },
-        { $limit: pageSize },
-        {
-          $project: {
-            _id: 0,
-            id: '$_id',
-            userId: '$userId',
-            name: '$name',
-            type: '$type',
-            isPublic: '$isPublic',
-            parentId: '$parentId',
+        ]);
+      } else {
+        cursor = dbClient.fileCollection.aggregate([
+          { $match: { parentId } },
+          { $sort: { id: -1 } },
+          { $skip: skip },
+          { $limit: pageSize },
+          {
+            $project: {
+              _id: 0,
+              id: '$_id',
+              userId: '$userId',
+              name: '$name',
+              type: '$type',
+              isPublic: '$isPublic',
+              parentId: '$parentId',
+            },
           },
-        },
-      ]);
+        ]);
+      }
+      const files = await cursor.toArray();
+      return res.send(files);
     }
-    const files = await cursor.toArray();
-    return res.send(files);
+    return res.status(500).send({ error: 'storage unavailable' });
   }
 
   static async putPublish(req, res) {
