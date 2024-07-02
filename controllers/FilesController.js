@@ -115,7 +115,7 @@ class FilesController {
     if (parentId === 0) {
       cursor = dbClient.fileCollection.aggregate([
         { $match: { userId } },
-        { $sort: { id: 1 } },
+        { $sort: { id: -1 } },
         { $skip: skip },
         { $limit: pageSize },
         {
@@ -126,9 +126,7 @@ class FilesController {
             name: '$name',
             type: '$type',
             isPublic: '$isPublic',
-            parentId: {
-              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
-            },
+            parentId: '$parentId',
           },
         },
       ]);
@@ -146,9 +144,7 @@ class FilesController {
             name: '$name',
             type: '$type',
             isPublic: '$isPublic',
-            parentId: {
-              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
-            },
+            parentId: '$parentId',
           },
         },
       ]);
