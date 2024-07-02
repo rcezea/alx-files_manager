@@ -100,7 +100,7 @@ class FilesController {
   }
 
   static async getIndex(req, res) {
-    let parentId = req.query.parentId || 0;
+    const parentId = req.query.parentId || 0;
     const userId = await authenticateUser(req);
     if (!userId) return handleUnauthorized(res);
 
@@ -111,33 +111,49 @@ class FilesController {
     const pageSize = 20;
     const skip = page * pageSize;
 
-    if (parentId) {
-      try {
-        parentId = ObjectId(parentId);
-      } catch (err) {
-        if (err) parentId = Number(req.query.parentId) || 0;
-      }
+    let cursor;
+    if (parentId === 0) {
+      cursor = dbClient.fileCollection.aggregate([
+        { $match: { userId } },
+        { $sort: { id: 1 } },
+        { $skip: skip },
+        { $limit: pageSize },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id',
+            userId: '$userId',
+            name: '$name',
+            type: '$type',
+            isPublic: '$isPublic',
+            parentId: {
+              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+            },
+          },
+        },
+      ]);
+    } else {
+      cursor = dbClient.fileCollection.aggregate([
+        { $match: { parentId } },
+        { $sort: { id: -1 } },
+        { $skip: skip },
+        { $limit: pageSize },
+        {
+          $project: {
+            _id: 0,
+            id: '$_id',
+            userId: '$userId',
+            name: '$name',
+            type: '$type',
+            isPublic: '$isPublic',
+            parentId: {
+              $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+            },
+          },
+        },
+      ]);
     }
-    const filesFilter = {
-      userId: user._id,
-      // eslint-disable-next-line no-nested-ternary
-      parentId: parentId === 0
-        ? parentId
-        : ObjectId.isValid(parentId) ? parentId : 0,
-    };
-    const cursor = dbClient.fileCollection.aggregate([
-      { $match: { filesFilter } },
-      { $skip: skip },
-      { $limit: pageSize },
-    ]);
     const files = await cursor.toArray();
-    for (let i = 0; i < files.length; i += 1) {
-      const doc = files[i];
-      doc.id = doc._id;
-      delete (doc._id);
-      delete (doc.localPath);
-    }
-    cursor.close();
     return res.send(files);
   }
 
