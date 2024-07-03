@@ -39,7 +39,7 @@ class FilesController {
       const newFile = await insertDocument('fileCollection', file);
       return res.status(201).json({
         id: newFile.insertedId.toString(),
-        userId: userId.toString(),
+        userId: file.userId.toString(),
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
@@ -62,7 +62,7 @@ class FilesController {
       const newFile = await insertDocument('fileCollection', file);
       return res.status(201).json({
         id: newFile.insertedId.toString(),
-        userId: userId.toString(),
+        userId: file.userId.toString(),
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
