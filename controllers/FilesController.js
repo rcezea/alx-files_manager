@@ -210,6 +210,7 @@ class FilesController {
     const mimeType = mime.lookup(file.name);
 
     let data = await fs.promises.readFile(file.localPath);
+    if (!data) return res.status(404).json({ error: 'Not found' });
     if (file.type === 'file') {
       data = Buffer.from(data, 'base64').toString();
     } else data = data.toString('base64');
