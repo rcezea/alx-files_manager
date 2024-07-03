@@ -144,7 +144,7 @@ class FilesController {
     const user = await getUserById(userId);
     if (!user) return handleUnauthorized(res);
 
-    const param = { userId, _id: new ObjectId(req.params.id) };
+    const param = { userId: new ObjectId(userId), _id: new ObjectId(req.params.id) };
     const updateDoc = {
       $set: {
         isPublic: true,
@@ -172,7 +172,7 @@ class FilesController {
     const user = await getUserById(userId);
     if (!user) return handleUnauthorized(res);
 
-    const param = { userId, _id: new ObjectId(req.params.id) };
+    const param = { userId: new ObjectId(userId), _id: new ObjectId(req.params.id) };
     const updateDoc = {
       $set: {
         isPublic: false,
