@@ -111,9 +111,9 @@ class FilesController {
     const skip = page * pageSize;
     let query;
     if (parentId === 0) {
-      query = { userId };
+      query = { userId: new ObjectId(userId) };
     } else {
-      query = { userId, parentId };
+      query = { userId: new ObjectId(userId), parentId: new ObjectId(parentId) };
     }
     const cursor = dbClient.fileCollection.aggregate([
       { $match: query },
