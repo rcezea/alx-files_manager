@@ -115,7 +115,6 @@ class FilesController {
     } else {
       query = { userId, parentId };
     }
-    console.log(parentId);
     const cursor = dbClient.fileCollection.aggregate([
       { $match: query },
       { $sort: { _id: -1 } },
