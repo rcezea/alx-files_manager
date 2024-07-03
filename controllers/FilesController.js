@@ -16,7 +16,7 @@ class FilesController {
     if (!user) return handleUnauthorized(res);
 
     const file = {
-      userId,
+      userId: ObjectId(userId),
       name: req.body.name || null,
       type: req.body.type || null,
       parentId: req.body.parentId || 0,
