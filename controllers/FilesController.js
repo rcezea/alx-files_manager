@@ -192,18 +192,16 @@ class FilesController {
 
   static async getFile(req, res) {
     const userId = await authenticateUser(req);
-    if (!userId) return handleUnauthorized(res);
-
     const user = await getUserById(userId);
-    if (!user) return handleUnauthorized(res);
 
     if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ error: 'Not found' });
     const file = await dbClient.fileCollection.findOne({
-      userId: new ObjectId(userId),
       _id: new ObjectId(req.params.id),
     });
+    // console.log(file);
+    // console.log(1234);
     if (!file) return res.status(404).json({ error: 'Not found' });
-    if (file.isPublic !== true && file.userId.toString() !== userId) return res.status(404).json({ error: 'Not found' });
+    if (file.isPublic === false && !user) return res.status(404).json({ error: 'Not found' });
     if (file.type === 'folder') return res.status(400).json({ error: 'A folder doesn\'t have content' });
     if (!Object.hasOwn(file, 'localPath')) return res.status(404).json({ error: 'Not found' });
     // Determine the MIME type based on the file extension
