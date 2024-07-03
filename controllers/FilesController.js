@@ -191,27 +191,48 @@ class FilesController {
   }
 
   static async getFile(req, res) {
-    const userId = await authenticateUser(req);
-    const user = await getUserById(userId);
+    try {
+      const userId = await authenticateUser(req);
+      const user = userId ? await getUserById(userId) : null;
 
-    if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ error: 'Not found' });
-    const file = await dbClient.fileCollection.findOne({
-      _id: new ObjectId(req.params.id),
-    });
-    if (!file) return res.status(404).json({ error: 'Not found' });
-    if (file.isPublic === false && !user) return res.status(404).json({ error: 'Not found' });
-    if (file.type === 'folder') return res.status(400).json({ error: 'A folder doesn\'t have content' });
-    if (!Object.hasOwn(file, 'localPath')) return res.status(404).json({ error: 'Not found' });
-    // Determine the MIME type based on the file extension
-    const mimeType = mime.lookup(file.name);
+      if (!ObjectId.isValid(req.params.id)) {
+        return res.status(404).json({ error: 'Not found' });
+      }
 
-    let data = await fs.promises.readFile(file.localPath);
-    if (!data) return res.status(404).json({ error: 'Not found' });
-    if (file.type === 'file') {
-      data = Buffer.from(data, 'base64').toString();
-    } else data = data.toString('base64');
-    res.setHeader('Content-Type', mimeType);
-    return res.status(200).send(data);
+      const file = await dbClient.fileCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+
+      if (!file) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      if (!file.isPublic && (!user || file.userId.toString() !== user._id.toString())) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      if (file.type === 'folder') {
+        return res.status(400).json({ error: 'A folder doesn\'t have content' });
+      }
+
+      if (!file.localPath) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      let data;
+      try {
+        data = await fs.promises.readFile(file.localPath);
+      } catch (err) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+
+      const mimeType = mime.lookup(file.name);
+      res.setHeader('Content-Type', mimeType);
+      return res.status(200).send(data);
+    } catch (error) {
+      console.error('Error in getFile:', error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
   }
 }
 
