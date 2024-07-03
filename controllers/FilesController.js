@@ -3,6 +3,7 @@
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
+import mime from 'mime-types';
 import authenticateUser from '../utils/authUtils';
 import { getUserById, insertDocument } from '../utils/dbUtils';
 import handleUnauthorized from '../utils/errorUtils';
@@ -187,6 +188,33 @@ class FilesController {
       isPublic: false,
       parentId: file.parentId,
     });
+  }
+
+  static async getFile(req, res) {
+    const userId = await authenticateUser(req);
+    if (!userId) return handleUnauthorized(res);
+
+    const user = await getUserById(userId);
+    if (!user) return handleUnauthorized(res);
+
+    if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ error: 'Not found' });
+    const file = await dbClient.fileCollection.findOne({
+      userId: new ObjectId(userId),
+      _id: new ObjectId(req.params.id),
+    });
+    if (!file) return res.status(404).json({ error: 'Not found' });
+    if (file.isPublic !== true && file.userId.toString() !== userId) return res.status(404).json({ error: 'Not found' });
+    if (file.type === 'folder') return res.status(400).json({ error: 'A folder doesn\'t have content' });
+    if (!Object.hasOwn(file, 'localPath')) return res.status(404).json({ error: 'Not found' });
+    // Determine the MIME type based on the file extension
+    const mimeType = mime.lookup(file.name);
+
+    let data = await fs.promises.readFile(file.localPath);
+    if (file.type === 'file') {
+      data = Buffer.from(data, 'base64').toString();
+    } else data = data.toString('base64');
+    res.setHeader('Content-Type', mimeType);
+    return res.status(200).send(data);
   }
 }
 
