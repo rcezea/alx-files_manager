@@ -99,7 +99,7 @@ class FilesController {
   }
 
   static async getIndex(req, res) {
-    const parentId = req.query.parentId || '0';
+    const parentId = req.query.parentId || 0;
     const userId = await authenticateUser(req);
     if (!userId) return handleUnauthorized(res);
 
@@ -110,7 +110,7 @@ class FilesController {
     const pageSize = 20;
     const skip = page * pageSize;
     let query;
-    if (parentId === '0') {
+    if (parentId === 0) {
       query = { userId };
     } else {
       query = { userId, parentId };
