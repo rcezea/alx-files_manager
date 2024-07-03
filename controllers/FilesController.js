@@ -16,7 +16,7 @@ class FilesController {
     if (!user) return handleUnauthorized(res);
 
     const file = {
-      userId: new ObjectId(userId),
+      userId,
       name: req.body.name || null,
       type: req.body.type || null,
       parentId: req.body.parentId || 0,
@@ -39,11 +39,11 @@ class FilesController {
       const newFile = await insertDocument('fileCollection', file);
       return res.status(201).json({
         id: newFile.insertedId.toString(),
-        userId: file.userId.toString(),
+        userId,
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId.toString(),
+        parentId: file.parentId,
       });
     }
 
@@ -62,11 +62,11 @@ class FilesController {
       const newFile = await insertDocument('fileCollection', file);
       return res.status(201).json({
         id: newFile.insertedId.toString(),
-        userId: file.userId.toString(),
+        userId,
         name: file.name,
         type: file.type,
         isPublic: file.isPublic,
-        parentId: file.parentId.toString(),
+        parentId: file.parentId,
       });
     } catch (error) {
       console.error('Error:', error);
