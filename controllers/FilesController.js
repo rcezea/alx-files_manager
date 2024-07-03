@@ -145,22 +145,20 @@ class FilesController {
     if (!user) return handleUnauthorized(res);
 
     const param = { userId: new ObjectId(userId), _id: new ObjectId(req.params.id) };
+    const file = await dbClient.fileCollection.findOne(param);
+    if (!file) return res.status(404).json({ error: 'Not found' });
     const updateDoc = {
       $set: {
         isPublic: true,
       },
     };
-
-    const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
-    if (!updatedFile) return res.status(404).json({ error: 'Not found' });
-
-    const file = await dbClient.fileCollection.findOne(param);
+    await dbClient.fileCollection.updateOne(param, updateDoc);
     return res.status(200).json({
       id: file._id,
       userId,
       name: file.name,
       type: file.type,
-      isPublic: file.isPublic,
+      isPublic: true,
       parentId: file.parentId,
     });
   }
@@ -173,22 +171,20 @@ class FilesController {
     if (!user) return handleUnauthorized(res);
 
     const param = { userId: new ObjectId(userId), _id: new ObjectId(req.params.id) };
+    const file = await dbClient.fileCollection.findOne(param);
+    if (!file) return res.status(404).json({ error: 'Not found' });
     const updateDoc = {
       $set: {
         isPublic: false,
       },
     };
-
-    const updatedFile = await dbClient.fileCollection.updateOne(param, updateDoc);
-    if (!updatedFile) return res.status(404).json({ error: 'Not found' });
-
-    const file = await dbClient.fileCollection.findOne(param);
+    await dbClient.fileCollection.updateOne(param, updateDoc);
     return res.status(200).json({
       id: file._id,
       userId,
       name: file.name,
       type: file.type,
-      isPublic: file.isPublic,
+      isPublic: false,
       parentId: file.parentId,
     });
   }
