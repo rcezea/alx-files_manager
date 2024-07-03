@@ -229,9 +229,8 @@ class FilesController {
       const mimeType = mime.lookup(file.name);
       res.setHeader('Content-Type', mimeType);
       return res.status(200).send(data);
-    } catch (error) {
-      console.error('Error in getFile:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+    } catch (e) {
+      return res.status(404).json({ error: 'Not found' });
     }
   }
 }
